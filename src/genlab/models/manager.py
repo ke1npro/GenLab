@@ -15,9 +15,6 @@ class ModelManager:
         from huggingface_hub import snapshot_download
 
         target = self._cache_dir / model_id.replace("/", "__")
-        if target.is_dir():
-            return str(target)
-
         target.mkdir(parents=True, exist_ok=True)
         snapshot_download(
             repo_id=model_id,
