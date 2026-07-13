@@ -20,22 +20,27 @@ class WanT2VProvider(BaseProvider):
         return "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
 
     def load(self, artifact: str) -> None:
+        import os
         import torch
         try:
             from huggingface_hub import HfApi
             from diffusers import WanPipeline
 
-            api = HfApi()
-            info = api.model_info(artifact, files_metadata=True)
-            safetensors = [s for s in info.siblings if s.rfilename.endswith(".safetensors")]
-            total_gb = 0
-            print(f"  Archivos a descargar ({len(safetensors)} .safetensors):")
-            for s in safetensors:
-                size_gb = s.size / (1024**3) if s.size else 0
-                total_gb += size_gb
-                print(f"    {s.rfilename}  ({size_gb:.1f} GB)")
-            print(f"  Total estimado: {total_gb:.1f} GB")
-            print(f"[..] Descargando...")
+            # Solo listar archivos si es un repo ID (no path local del cache)
+            if not os.path.isdir(artifact):
+                api = HfApi()
+                info = api.model_info(artifact, files_metadata=True)
+                safetensors = [s for s in info.siblings if s.rfilename.endswith(".safetensors")]
+                total_gb = 0
+                print(f"  Archivos a descargar ({len(safetensors)} .safetensors):")
+                for s in safetensors:
+                    size_gb = s.size / (1024**3) if s.size else 0
+                    total_gb += size_gb
+                    print(f"    {s.rfilename}  ({size_gb:.1f} GB)")
+                print(f"  Total estimado: {total_gb:.1f} GB")
+                print(f"[..] Descargando...")
+            else:
+                print(f"[..] Cargando modelo desde cache local: {artifact}")
 
             self._pipeline = WanPipeline.from_pretrained(
                 artifact,
