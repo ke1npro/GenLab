@@ -5,11 +5,18 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from genlab.config.schema import GenLabConfig
 from genlab.core.exceptions import StorageError
 from genlab.core.paths import resolve_paths
 from genlab.models.manager import ModelManager
 from genlab.models.registry import get_provider
 from genlab.tasks.registry import get_task
+
+
+def _cfg_to_dict(cfg: object) -> dict:
+    if isinstance(cfg, GenLabConfig):
+        return cfg._raw
+    return cfg if isinstance(cfg, dict) else {}
 
 
 class Step(ABC):
@@ -32,7 +39,7 @@ class InspectModelStep(Step):
         from genlab.assets.manager import AssetManager
         am = AssetManager(paths["cache_dir"])
         provider_cls = get_provider(model_name)
-        provider = provider_cls(config=ctx.get("config"))
+        provider = provider_cls(config=_cfg_to_dict(ctx.get("config")))
         inspector = ModelInspector(am)
         if not inspector.confirm(provider):
             from genlab.core.exceptions import PipelineError
@@ -46,7 +53,7 @@ class LoadModelStep(Step):
         provider = ctx.get("_provider")
         if provider is None:
             from genlab.models.registry import get_provider
-            provider = get_provider(ctx["model"])(config=ctx.get("config"))
+            provider = get_provider(ctx["model"])(config=_cfg_to_dict(ctx.get("config")))
         mgr = ModelManager(cache_dir=paths["cache_dir"])
         artifact_path = mgr.ensure_provider(provider)
         provider.load(artifact_path)
