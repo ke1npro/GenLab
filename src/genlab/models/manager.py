@@ -1,47 +1,38 @@
 from __future__ import annotations
 
-import os
-import shutil
 from pathlib import Path
 from typing import Any
+
+from genlab.assets.manager import AssetManager
 
 
 class ModelManager:
     def __init__(self, cache_dir: str | None = None):
-        self._cache_dir = Path(cache_dir) if cache_dir else Path("models_cache")
-        self._cache_dir.mkdir(parents=True, exist_ok=True)
+        cache_dir = cache_dir or "models_cache"
+        self._assets = AssetManager(cache_dir)
 
     def ensure(self, model_id: str) -> str:
-        from huggingface_hub import snapshot_download
+        return self._assets.resolve_raw(model_id)
 
-        target = self._cache_dir / model_id.replace("/", "__")
-        target.mkdir(parents=True, exist_ok=True)
-        snapshot_download(
-            repo_id=model_id,
-            local_dir=str(target),
-            local_dir_use_symlinks=False,
-            resume_download=True,
-        )
-        return str(target)
+    def ensure_provider(self, provider: Any) -> str:
+        return self._assets.resolve(provider)
+
+    def inspect(self, provider: Any) -> dict[str, Any]:
+        return self._assets.estimate(provider)
 
     def get_info(self, model_id: str) -> dict[str, Any]:
-        target = self._cache_dir / model_id.replace("/", "__")
-        if not target.is_dir():
+        path = self._assets.cached_path(model_id)
+        if not path:
             return {"exists": False, "path": None, "size_mb": 0}
-        total = sum(f.stat().st_size for f in target.rglob("*") if f.is_file())
+        total = sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
         return {
             "exists": True,
-            "path": str(target),
+            "path": str(path),
             "size_mb": round(total / (1024 * 1024), 1),
         }
 
     def clear_cache(self, model_id: str) -> None:
-        target = self._cache_dir / model_id.replace("/", "__")
-        if target.is_dir():
-            shutil.rmtree(str(target))
+        self._assets.clear(model_id)
 
     def clear_all(self) -> None:
-        if self._cache_dir.is_dir():
-            for item in self._cache_dir.iterdir():
-                if item.is_dir():
-                    shutil.rmtree(str(item))
+        self._assets.clear_all()

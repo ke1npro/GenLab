@@ -24,6 +24,22 @@ class ResolvePathsStep(Step):
         return {"paths": paths}
 
 
+class InspectModelStep(Step):
+    def execute(self, ctx: dict) -> dict:
+        model_name = ctx["model"]
+        paths = ctx["paths"]
+        from genlab.assets.inspector import ModelInspector
+        from genlab.assets.manager import AssetManager
+        am = AssetManager(paths["cache_dir"])
+        provider_cls = get_provider(model_name)
+        provider = provider_cls()
+        inspector = ModelInspector(am)
+        if not inspector.confirm(provider):
+            from genlab.core.exceptions import PipelineError
+            raise PipelineError("Descarga cancelada por el usuario.")
+        return {"inspector": inspector}
+
+
 class LoadModelStep(Step):
     def execute(self, ctx: dict) -> dict:
         model_name = ctx["model"]
@@ -32,7 +48,7 @@ class LoadModelStep(Step):
         provider_cls = get_provider(model_name)
         provider = provider_cls()
 
-        artifact_path = mgr.ensure(provider.get_model_id())
+        artifact_path = mgr.ensure_provider(provider)
         provider.load(artifact_path)
 
         return {"provider": provider, "manager": mgr}

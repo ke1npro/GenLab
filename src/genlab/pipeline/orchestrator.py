@@ -9,6 +9,7 @@ from genlab.pipeline.steps import (
     CleanupStep,
     ExportStep,
     GenerateStep,
+    InspectModelStep,
     LoadModelStep,
     PostprocessStep,
     PrepareInputsStep,
@@ -21,6 +22,7 @@ class Pipeline:
         self.config_dir = config_dir
         self._steps = [
             ("resolve_paths", ResolvePathsStep()),
+            ("inspect_model", InspectModelStep()),
             ("load_model", LoadModelStep()),
             ("prepare_inputs", PrepareInputsStep()),
             ("generate", GenerateStep()),

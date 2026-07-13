@@ -39,3 +39,6 @@ class ExportError(ServiceError):
 
 class StorageError(GenLabError):
     pass
+
+class AssetError(GenLabError):
+    pass
