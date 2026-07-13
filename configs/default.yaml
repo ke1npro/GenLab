@@ -1,0 +1,16 @@
+output:
+  dir: outputs
+  temp_dir: outputs/tmp
+  manifest: true
+
+model:
+  dtype: float16
+  seed: null
+
+hardware:
+  enable_offload: false
+  enable_amp: false
+
+services:
+  huggingface:
+    token: null

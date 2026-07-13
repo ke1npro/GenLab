@@ -1,0 +1,7 @@
+model:
+  dtype: float16
+  steps: 50
+
+hardware:
+  enable_offload: false
+  enable_amp: false

@@ -1,0 +1,14 @@
+# Core
+pyyaml>=6.0
+psutil>=5.9.0
+
+# GPU / modelos (instalar en Colab)
+torch>=2.0.0
+diffusers>=0.30.0
+transformers>=4.40.0
+huggingface-hub>=0.20.0
+accelerate>=0.20.0
+
+# Video export
+imageio>=2.30.0
+imageio-ffmpeg>=0.4.0

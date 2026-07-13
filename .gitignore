@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Colab / temp
+outputs/
+models_cache/
+
+# Tests
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env

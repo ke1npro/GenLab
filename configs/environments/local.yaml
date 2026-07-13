@@ -1,0 +1,14 @@
+environment:
+  type: local
+
+storage:
+  base: .
+
+paths:
+  output_dir: ./outputs
+  cache_dir: ./models_cache
+  temp_dir: ./outputs/tmp
+
+hardware:
+  enable_offload: false
+  enable_amp: false

@@ -1,0 +1,15 @@
+environment:
+  type: colab
+
+storage:
+  base: /content
+  drive_mount: /content/drive/MyDrive/GenLab
+
+paths:
+  output_dir: /content/drive/MyDrive/GenLab/outputs
+  cache_dir: /content/models_cache
+  temp_dir: /content/tmp
+
+hardware:
+  enable_offload: true
+  enable_amp: true

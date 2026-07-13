@@ -1,0 +1,7 @@
+model:
+  dtype: int8
+  steps: 30
+
+hardware:
+  enable_offload: true
+  enable_amp: true

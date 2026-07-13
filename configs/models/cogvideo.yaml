@@ -1,0 +1,10 @@
+model:
+  model_id: THUDM/CogVideoX-2b
+  dtype: float16
+  steps: 50
+  guidance_scale: 7.0
+  fps: 8
+  frames: 49
+  resolution:
+    width: 480
+    height: 720
