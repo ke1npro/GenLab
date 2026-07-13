@@ -83,3 +83,13 @@ def _print_report(report: list[tuple[str, str]]) -> None:
     for label, value in report:
         print(f"  {label:<16} {value}")
     print(sep)
+
+    gpu_entry = next((v for k, v in report if k == "GPU"), "")
+    if gpu_entry in ("N/A", ""):
+        warn = (
+            "  ⚠  NO SE DETECTÓ GPU\n"
+            "  Para generar video necesitas una GPU (T4+ en Colab).\n"
+            "  → Entorno de ejecución → Cambiar tipo de entorno de ejecución → T4 GPU"
+        )
+        print(warn)
+        print(sep)

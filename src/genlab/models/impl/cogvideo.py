@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import torch
-
 from genlab.core.exceptions import ModelLoadError
 from genlab.models.base import BaseProvider
 from genlab.models.registry import register_provider
@@ -24,6 +22,7 @@ class CogVideoProvider(BaseProvider):
         return "THUDM/CogVideoX-2b"
 
     def load(self, artifact: str) -> None:
+        import torch
         try:
             from diffusers import CogVideoXPipeline
 
@@ -41,6 +40,7 @@ class CogVideoProvider(BaseProvider):
             raise ModelLoadError(f"Error al cargar CogVideoX desde {artifact}: {exc}") from exc
 
     def generate(self, inputs: dict[str, Any]) -> dict[str, Any]:
+        import torch
         if self._pipeline is None:
             raise ModelLoadError("Provider no cargado. Llama a load() primero.")
 
@@ -70,6 +70,7 @@ class CogVideoProvider(BaseProvider):
         return {"frames": output.frames[0]}
 
     def unload(self) -> None:
+        import torch
         if self._pipeline is not None:
             self._pipeline = None
         if torch.cuda.is_available():
