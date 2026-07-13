@@ -27,6 +27,14 @@ class LTXVideoProvider(BaseProvider):
             self._pipeline = LTXPipeline.from_pretrained(
                 artifact,
                 torch_dtype=torch.bfloat16,
+                ignore_patterns=[
+                    "ltxv-13b-*",
+                    "ltxv-2b-*",
+                    "ltxv-spatial-*",
+                    "ltxv-temporal-*",
+                    "ltx-video-2b-*",
+                    "media/*",
+                ],
             )
             if torch.cuda.is_available():
                 self._pipeline.enable_model_cpu_offload()
