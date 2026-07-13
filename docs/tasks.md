@@ -12,11 +12,13 @@ Una Task = una intención con esquema de entrada/salida. Valida contra `provider
   - `negative_prompt` (str, opcional) — lo que NO debe aparecer
   - `seed` (int, opcional) — semilla para reproducibilidad
   - `steps` / `num_inference_steps` (int, default: 50)
-  - `frames` / `num_frames` (int, default: 49)
-  - `fps` (int, default: 8)
-  - `resolution` (dict: width/height, default: 480x720)
-  - `guidance_scale` (float, default: 7.0)
+  - `frames` / `num_frames` (int, default: 81)
+  - `fps` (int, default: 16)
+  - `resolution` (dict: width/height, default: 832x480)
+  - `guidance_scale` (float, default: 5.0)
 - **Salidas**: `frames` (lista de PIL Images/PIL.Image)
+- **Nota**: Los defaults corresponden al modelo `wan` (Wan2.1 T2V 1.3B).  
+  Cada modelo puede sobreescribirlos en su `configs/models/<nombre>.yaml`.
 
 ## Estado completo
 

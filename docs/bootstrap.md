@@ -33,7 +33,7 @@
 ## Responsabilidades
 - Preparar, no ejecutar generación.
 - Fallar temprano solo si falta algo irrecuperable.
-- No descargar modelos (eso es del `ModelManager`).
+- No descargar modelos (eso es del `AssetManager` / `ModelManager`).
 
 ## Dependencias
 - `core/environment.py`, `core/hardware.py`, `core/paths.py`, `config/loader.py`
