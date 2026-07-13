@@ -19,7 +19,7 @@ Cada Provider = un modelo. Solo inferencia. Pesos resueltos por `ModelManager`.
 | Provider | Tareas soportadas | Memoria est. | Requisitos | Limitaciones | Estado |
 |---|---|---|---|---|---|
 | cogvideo | text_to_video, image_to_video | ~13-15GB | diffusers, CUDA | calidad/media, lenta en T4 | MVP (1.5) |
-| ltx | text_to_video | ~5-6GB | diffusers, CUDA | resolución fija 768x512 | MVP (1.5) |
+| wan | text_to_video | ~5-7GB | diffusers, CUDA | 480p recomendada | MVP (1.5) |
 | flux | text_to_image, image_to_image | ~TBD | diffusers | no video | Beta (2.1) |
 | ltx | text_to_video | ~TBD | diffusers | — | Beta (2.8) |
 | mochi | text_to_video | alta | diffusers | VRAM alta | Beta (2.8) |
