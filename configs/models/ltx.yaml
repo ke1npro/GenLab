@@ -1,0 +1,10 @@
+model:
+  model_id: Lightricks/LTX-Video
+  dtype: bfloat16
+  steps: 30
+  guidance_scale: 5.0
+  fps: 24
+  frames: 121
+  resolution:
+    width: 768
+    height: 512
