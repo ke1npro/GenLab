@@ -42,12 +42,36 @@ class ModelInspector:
                 print(f"    ... y {len(dl['files']) - 10} archivos más")
         print("=" * 56)
 
+    def diagnostic_report(self, provider: Any) -> dict[str, Any]:
+        diag = self._am.diagnostic(provider)
+        sep = "=" * 56
+        print(sep)
+        print("  Diagnóstico de descarga")
+        print(sep)
+
+        hf_status = "Activado" if diag["hf_transfer_active"] else "Disponible" if diag["hf_transfer_available"] else "No instalado"
+        cache_status = "Descargado" if diag["cached"] else "No descargado"
+
+        time_str = f"{diag['estimated_time_min']:.0f} minutos (~{diag['bandwidth_mbps']:.1f} MB/s)" if diag["bandwidth_mbps"] > 0 else "Desconocido"
+
+        print(f"  {'Modelo:':<20} {diag['model_name']}")
+        print(f"  {'Repositorio:':<20} {diag['repo_total_gb']} GB")
+        print(f"  {'Descarga estim.:':<20} {diag['download_size_gb']} GB")
+        print(f"  {'Espacio libre:':<20} {diag['free_space_gb']} GB")
+        print(f"  {'hf_transfer:':<20} {hf_status}")
+        print(f"  {'Tiempo estim.:':<20} {time_str}")
+        print(f"  {'Caché HF:':<20} {cache_status}")
+        if diag["cached"]:
+            print(f"  {'Ruta:':<20} {diag['cached_path']}")
+        print(sep)
+        return diag
+
     def confirm(self, provider: Any) -> bool:
-        self.print_report(provider)
         info = self.inspect(provider)
         if info["cached"]:
             return True
-        dl = info["download"]
-        print(f"\nSe descargarán ~{dl['total_gb']} GB.")
+
+        diag = self.diagnostic_report(provider)
+        print(f"\nSe descargarán ~{diag['download_size_gb']} GB.")
         respuesta = input("  ¿Continuar? (s/N): ").strip().lower()
         return respuesta == "s"

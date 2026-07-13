@@ -13,3 +13,8 @@ paths:
 hardware:
   enable_offload: true
   enable_amp: true
+
+download:
+  hf_transfer: auto
+  verify_space: true
+  cache_symlinks: true

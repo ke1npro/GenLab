@@ -42,3 +42,9 @@ class StorageError(GenLabError):
 
 class AssetError(GenLabError):
     pass
+
+class DownloadError(AssetError):
+    pass
+
+class InsufficientDiskError(AssetError):
+    pass

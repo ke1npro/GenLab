@@ -6,6 +6,10 @@ from typing import Any
 
 class BaseProvider(ABC):
     capabilities: dict[str, bool] = {}
+    _default_model_id: str = ""
+
+    def __init__(self, config: dict | None = None):
+        self._config = config or {}
 
     @abstractmethod
     def load(self, artifact: str) -> None:
@@ -20,7 +24,8 @@ class BaseProvider(ABC):
         ...
 
     def get_model_id(self) -> str:
-        raise NotImplementedError
+        cfg_model = (self._config.get("model") or {}) if self._config else {}
+        return cfg_model.get("model_id", self._default_model_id)
 
     def get_required_files(self) -> list[str]:
         return ["model_index.json", "scheduler/*", "text_encoder/*", "tokenizer/*", "transformer/*", "vae/*"]

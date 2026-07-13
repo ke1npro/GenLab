@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+from genlab.assets.manager import AssetManager
 from genlab.config.loader import load_config
 from genlab.core.environment import detect_environment
 from genlab.core.hardware import check_disk_free, detect_hardware
@@ -19,8 +20,9 @@ def bootstrap(config_dir: str | Path | None = None) -> dict:
     config = _try_load_config(paths["config_dir"])
 
     hf_status = _check_hf_token()
+    hf_transfer = AssetManager.hf_transfer_available()
 
-    report = _build_report(env, hw, paths, hf_status)
+    report = _build_report(env, hw, paths, hf_status, hf_transfer)
     _print_report(report)
 
     return {
@@ -28,6 +30,7 @@ def bootstrap(config_dir: str | Path | None = None) -> dict:
         "hardware": hw,
         "paths": paths,
         "hf_token_ok": hf_status,
+        "hf_transfer": hf_transfer,
         "config": config,
         "report": report,
     }
@@ -60,7 +63,7 @@ def _check_hf_token() -> bool:
         return False
 
 
-def _build_report(env: dict, hw: dict, paths: dict, hf_ok: bool) -> list[tuple[str, str]]:
+def _build_report(env: dict, hw: dict, paths: dict, hf_ok: bool, hf_transfer: bool = False) -> list[tuple[str, str]]:
     return [
         ("Entorno", env["type"].upper()),
         ("GPU", hw["gpu"]),
@@ -70,6 +73,7 @@ def _build_report(env: dict, hw: dict, paths: dict, hf_ok: bool) -> list[tuple[s
         ("Drive", "OK" if env["is_colab"] and paths.get("drive_base") else "N/A"),
         ("Internet", "OK"),
         ("HF Token", "OK" if hf_ok else "NO CONFIGURADO"),
+        ("hf_transfer", "Disponible" if hf_transfer else "No instalado"),
         ("Espacio libre", f'{check_disk_free()} GB'),
         ("Cache modelos", paths.get("cache_dir", "N/A")),
     ]

@@ -9,17 +9,16 @@ from genlab.models.registry import register_provider
 
 @register_provider("cogvideo")
 class CogVideoProvider(BaseProvider):
+    _default_model_id = "zai-org/CogVideoX-2b"
     capabilities = {
         "supports_text_to_video": True,
         "supports_image_to_video": True,
     }
 
-    def __init__(self):
+    def __init__(self, config: dict | None = None):
+        super().__init__(config=config)
         self._pipeline = None
         self._device = None
-
-    def get_model_id(self) -> str:
-        return "THUDM/CogVideoX-2b"
 
     def get_required_files(self) -> list[str]:
         return [

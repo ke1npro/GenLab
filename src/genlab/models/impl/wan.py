@@ -9,15 +9,14 @@ from genlab.models.registry import register_provider
 
 @register_provider("wan")
 class WanT2VProvider(BaseProvider):
+    _default_model_id = "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
     capabilities = {
         "supports_text_to_video": True,
     }
 
-    def __init__(self):
+    def __init__(self, config: dict | None = None):
+        super().__init__(config=config)
         self._pipeline = None
-
-    def get_model_id(self) -> str:
-        return "Wan-AI/Wan2.1-T2V-1.3B-Diffusers"
 
     def get_required_files(self) -> list[str]:
         return [

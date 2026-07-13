@@ -19,6 +19,7 @@ gpu = [
     "transformers>=4.40.0",
     "huggingface-hub>=0.20.0",
     "accelerate>=0.20.0",
+    "hf_transfer>=0.1.6",
 ]
 video = [
     "imageio>=2.30.0",

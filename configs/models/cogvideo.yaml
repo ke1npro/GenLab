@@ -1,5 +1,5 @@
 model:
-  model_id: THUDM/CogVideoX-2b
+  model_id: zai-org/CogVideoX-2b
   dtype: float16
   steps: 50
   guidance_scale: 7.0
