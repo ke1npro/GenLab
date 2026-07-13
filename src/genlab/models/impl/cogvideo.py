@@ -21,6 +21,25 @@ class CogVideoProvider(BaseProvider):
     def get_model_id(self) -> str:
         return "THUDM/CogVideoX-2b"
 
+    def get_required_files(self) -> list[str]:
+        return [
+            "model_index.json",
+            "scheduler/*",
+            "text_encoder/*",
+            "tokenizer/*",
+            "transformer/*",
+            "vae/*",
+        ]
+
+    def get_metadata(self) -> dict:
+        return {
+            "model_id": self.get_model_id(),
+            "estimated_vram_gb": 15,
+            "license": "apache-2.0",
+            "hardware_compatibility": {"t4": True},
+            "description": "CogVideoX-2b (Tsinghua/KEG) — text-to-video + image-to-video, ~13-15GB descarga",
+        }
+
     def load(self, artifact: str) -> None:
         import torch
         try:
