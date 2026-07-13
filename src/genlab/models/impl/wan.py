@@ -22,7 +22,20 @@ class WanT2VProvider(BaseProvider):
     def load(self, artifact: str) -> None:
         import torch
         try:
+            from huggingface_hub import HfApi
             from diffusers import WanPipeline
+
+            api = HfApi()
+            info = api.model_info(artifact, files_metadata=True)
+            safetensors = [s for s in info.siblings if s.rfilename.endswith(".safetensors")]
+            total_gb = 0
+            print(f"  Archivos a descargar ({len(safetensors)} .safetensors):")
+            for s in safetensors:
+                size_gb = s.size / (1024**3) if s.size else 0
+                total_gb += size_gb
+                print(f"    {s.rfilename}  ({size_gb:.1f} GB)")
+            print(f"  Total estimado: {total_gb:.1f} GB")
+            print(f"[..] Descargando...")
 
             self._pipeline = WanPipeline.from_pretrained(
                 artifact,
