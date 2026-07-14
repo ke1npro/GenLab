@@ -5,7 +5,7 @@
 ## Orden de ejecución (implementado en `core/bootstrap.py`)
 1. Detectar entorno (`core/environment.py`): ¿Colab (import google.colab / COLAB_GPU env var)? ¿local?
 2. Detectar hardware (`core/hardware.py`): GPU, VRAM, RAM, CUDA (vía torch)
-3. Detectar red: estado HF token (env var HF_TOKEN → huggingface_hub.get_token)
+3. Detectar red: estado HF token (env var HF_TOKEN → huggingface_hub.get_token), disponibilidad de `hf_transfer`
 4. Detectar Drive: montado en Colab (por ruta)
 5. Resolver paths (`core/paths.py`): Colab → `/content/drive/MyDrive/GenLab/...`; local → `./outputs/...`
 6. Crear carpetas necesarias (outputs/runs, outputs/tmp, models_cache)
@@ -25,6 +25,7 @@
   Drive            OK
   Internet         OK
   HF Token         OK
+  hf_transfer      Disponible
   Espacio libre    XX GB
   Cache modelos    /content/models_cache
 --------------------------------------------------
@@ -37,4 +38,5 @@
 
 ## Dependencias
 - `core/environment.py`, `core/hardware.py`, `core/paths.py`, `config/loader.py`
+- `core/bootstrap.py` ahora también detecta `hf_transfer` y lo reporta
 - Opcional: `huggingface_hub` (para chequear token)

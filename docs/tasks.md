@@ -4,7 +4,7 @@ Una Task = una intención con esquema de entrada/salida. Valida contra `provider
 
 ## Tasks implementadas
 
-### text_to_video (MVP 1.6)
+### text_to_video
 - **Registry**: `@register_task("text_to_video")`
 - **Clase**: `TextToVideoTask`
 - **Entradas**:
@@ -16,21 +16,37 @@ Una Task = una intención con esquema de entrada/salida. Valida contra `provider
   - `fps` (int, default: 16)
   - `resolution` (dict: width/height, default: 832x480)
   - `guidance_scale` (float, default: 5.0)
-- **Salidas**: `frames` (lista de PIL Images/PIL.Image)
-- **Nota**: Los defaults corresponden al modelo `wan` (Wan2.1 T2V 1.3B).  
-  Cada modelo puede sobreescribirlos en su `configs/models/<nombre>.yaml`.
+- **Salidas**: `frames` (lista de PIL Images), exportado como `.mp4`
+- **Nota**: Los defaults corresponden al modelo `wan`. Cada modelo puede sobreescribirlos en su `configs/models/<nombre>.yaml`.
+
+### text_to_image — NUEVO
+- **Registry**: `@register_task("text_to_image")`
+- **Clase**: `TextToImageTask`
+- **Entradas**:
+  - `prompt` (str, requerido) — descripción de la imagen
+  - `negative_prompt` (str, opcional) — lo que NO debe aparecer
+  - `seed` (int, opcional) — semilla para reproducibilidad
+  - `steps` / `num_inference_steps` (int, default: 50)
+  - `resolution` (dict: width/height, default: 1024x1024)
+  - `guidance_scale` (float, default: 7.0)
+- **Salidas**: `image` (PIL Image), exportado como `.png`
+- **Modelos compatibles**: `flux` (FLUX.1-schnell, 4 pasos), `sdxl` (SDXL 1.0, 50 pasos)
+
+## Selección automática de tarea
+
+En el notebook, al elegir un modelo, la tarea se selecciona automáticamente:
+- Modelos de video (`wan`, `cogvideo`) → `text_to_video`
+- Modelos de imagen (`flux`, `sdxl`) → `text_to_image`
 
 ## Estado completo
 
-| Task | Entradas | Salidas | Compatibilidad | Restricciones | Estado |
-|---|---|---|---|---|---|
-| text_to_video | prompt, (negative_prompt), seed, steps, frames, fps, resolution | video (mp4) | providers con `supports_text_to_video` | frames múltiplo de 8 (según modelo) | MVP (1.6) |
-| image_to_video | image, prompt | video | `supports_image_to_video` | — | Beta |
-| text_to_image | prompt | image | `supports_text_to_image` | — | Beta (2.2) |
-| image_to_image | image, prompt, strength | image | `supports_image_to_image` | — | Beta (2.2) |
-| inpainting | image, mask, prompt | image | `supports_inpainting` | requiere mask | Beta (2.2, stub) |
-| upscaling | image, scale | image | `supports_upscaling` | — | Future |
-| audio_generation | prompt, (duration) | audio | `supports_audio` | — | Future |
+| Task | Entradas | Salidas | Compatibilidad | Estado |
+|---|---|---|---|---|
+| text_to_video | prompt, seed, steps, frames, fps, resolution | video (.mp4) | `supports_text_to_video` | ✅ |
+| text_to_image | prompt, seed, steps, resolution | image (.png) | `supports_text_to_image` | ✅ |
+| image_to_video | image, prompt | video | `supports_image_to_video` | Beta |
+| image_to_image | image, prompt, strength | image | `supports_image_to_image` | Beta |
+| inpainting | image, mask, prompt | image | `supports_inpainting` | Beta (stub) |
 
 ## Reglas
 - `BaseTask` con `validate(provider)`, `prepare_inputs()`, `postprocess()`.
