@@ -10,24 +10,24 @@
 > Si el hito cambia, este archivo se actualiza automáticamente.
 
 ## Hito actual
-MVP completo — todos los hitos 1.1–1.8 implementados y revisados.
+Generación de imágenes + descargas optimizadas.
 
 ## Estado
-✅ **Listo para desplegar en Google Colab**
+✅ **Enfoque en generación de imágenes (Flux/SDXL) con descargas optimizadas**
 
-## Checklist de verificación pre-Colab
+## Logros alcanzados
 
-- [x] Sin imports circulares (fix: import diferido en `config/loader.py`)
-- [x] `pyproject.toml` con deps ligeras por defecto; `[gpu]` y `[video]` como extras
-- [x] Notebook con manejo robusto de HF token (Secrets → input manual → skip)
-- [x] Variable `REPO_URL` editable en notebook
-- [x] CogVideoProvider: separa CPU offload de GPU to()
-- [x] Precedencia: default → env (colab/local) → modelo → perfil → args
-- [x] Paths correctos en Colab (`/content/drive/MyDrive/GenLab/outputs`)
-- [x] Cache propia (`/content/models_cache`) no interfiere con HF_HOME
-- [x] Bootstrap detecta Colab automáticamente
-- [x] Test suite: 28 tests, 26 pasando (2 require Pillow local)
-- [x] Todos los docs actualizados
+- [x] AssetManager optimizado: `max_workers=8`, `hf_transfer` automático, verificación de espacio, sonda de ancho de banda, diagnóstico completo
+- [x] ModelInspector con menú de estrategia de descarga (selectivo/completo) y reporte diagnóstico detallado
+- [x] Cache HF con symlinks para reutilizar blobs cacheados
+- [x] Providers: Flux (FLUX.1-schnell) y SDXL (Stable Diffusion XL 1.0) para `text_to_image`
+- [x] Task: `text_to_image` con exportación a PNG
+- [x] Pipeline adaptado: ExportStep maneja imágenes (`.png`) y videos (`.mp4`) según salida
+- [x] Notebook con menú interactivo numerado para elegir modelo + model_id personalizado
+- [x] Provider configurable: `get_model_id()` lee desde config YAML con fallback a hardcoded
+- [x] `GenLabConfig` convertido a dict en todos los steps (`_cfg_to_dict`)
+- [x] Tests: 49 tests, 1 skip (huggingface-hub no instalado localmente)
+- [x] Docs actualizados: providers, tasks, pipeline, bootstrap
 
 ## Cómo desplegar
 1. Subir a GitHub (repo público).
@@ -37,21 +37,23 @@ MVP completo — todos los hitos 1.1–1.8 implementados y revisados.
 5. Ejecutar todas las celdas.
 
 ## Próximo paso
-Beta 2.1 — Provider FLUX + tasks image
+Beta 2.2 — image_to_image, inpainting, upscaling
 
-## Estructura final del MVP
+## Estructura actual
 ```
 src/genlab/
 ├── __init__.py / genlab.py     → API pública GenLab.run() / .bootstrap()
+├── assets/                      → AssetManager + ModelInspector (descargas optimizadas)
 ├── config/                      → schema.py + loader.py (precedencia 5 niveles)
 ├── core/                        → exceptions, environment, hardware, paths, bootstrap
-├── models/                      → BaseProvider, ModelManager, registry, impl/cogvideo.py
-├── tasks/                       → BaseTask, registry, text_to_video.py
-├── pipeline/                    → orchestrator.py + steps.py (7 steps)
+├── models/                      → BaseProvider, ModelManager, registry
+│   └── impl/                    → wan, cogvideo, flux, sdxl
+├── tasks/                       → BaseTask, registry, text_to_video, text_to_image
+├── pipeline/                    → orchestrator.py + steps.py (8 steps)
 ├── services/                    → huggingface.py, exporter.py
 ├── storage/                     → local.py
 └── utils/                       → (vacío, preparado)
-configs/{default,models,profiles,environments}/
+configs/{default,environments,models,profiles}/
 notebooks/launcher.ipynb
-tests/ (28 tests)
+tests/ (49 tests)
 ```

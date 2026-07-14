@@ -33,10 +33,10 @@ Cada Provider = un modelo. Solo inferencia. Assets resueltos por `AssetManager` 
 - **Pipeline**: `FluxPipeline` (diffusers)
 - **Tareas**: `text_to_image`
 - **VRAM**: ~12 GB (enable_model_cpu_offload)
-- **Descarga**: ~12 GB
+- **Descarga**: ~12 GB (incluye T5 text_encoder_2)
 - **Licencia**: Apache 2.0 (schnell)
 - **Hardware**: T4 compatible
-- **Notas**: 4 pasos de inferencia por defecto, guidance_scale=0.0
+- **Notas**: 4 pasos de inferencia por defecto, guidance_scale=0.0. Requiere `text_encoder_2/*` y `tokenizer_2/*` en patrones.
 
 ### sdxl — NUEVO
 - **Registry**: `@register_provider("sdxl")`
@@ -52,7 +52,7 @@ Cada Provider = un modelo. Solo inferencia. Assets resueltos por `AssetManager` 
 ## AssetManager
 
 Cada provider declara los archivos que necesita mediante `get_required_files()` (glob patterns).  
-`AssetManager` usa `snapshot_download` con `allow_patterns` para descargar **solo** esos archivos con **4 hilos paralelos** (`max_workers=4`), más `hf_transfer` como acelerador cuando está disponible.
+`AssetManager` usa `snapshot_download` con `allow_patterns` para descargar **solo** esos archivos con **8 hilos paralelos** (`max_workers=8`), más `hf_transfer` como acelerador Rust cuando está disponible.
 
 ```python
 class WanT2VProvider(BaseProvider):

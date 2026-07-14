@@ -32,7 +32,7 @@ La tarea se detecta automáticamente según el modelo en el notebook (video → 
 
 **AssetManager** usa `snapshot_download` con:
 - `allow_patterns` — descarga solo archivos necesarios del provider
-- `max_workers=4` — descarga paralela con 4 hilos
+- `max_workers=8` — descarga paralela con 8 hilos
 - `hf_transfer` — acelerador Rust si está instalado (automático para descargas >500 MB)
 
 **ExportStep** detecta el tipo de salida automáticamente:
