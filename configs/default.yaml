@@ -14,7 +14,6 @@ hardware:
 download:
   hf_transfer: auto
   verify_space: true
-  cache_symlinks: auto
 
 services:
   huggingface:

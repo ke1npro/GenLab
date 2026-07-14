@@ -14,8 +14,8 @@ class ModelManager:
     def ensure(self, model_id: str) -> str:
         return self._assets.resolve_raw(model_id)
 
-    def ensure_provider(self, provider: Any) -> str:
-        return self._assets.resolve(provider)
+    def ensure_provider(self, provider: Any, strategy: str = "selective") -> str:
+        return self._assets.resolve(provider, strategy=strategy)
 
     def inspect(self, provider: Any) -> dict[str, Any]:
         return self._assets.estimate(provider)

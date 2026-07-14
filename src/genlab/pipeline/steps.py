@@ -44,7 +44,7 @@ class InspectModelStep(Step):
         if not inspector.confirm(provider):
             from genlab.core.exceptions import PipelineError
             raise PipelineError("Descarga cancelada por el usuario.")
-        return {"inspector": inspector, "_provider": provider}
+        return {"inspector": inspector, "_provider": provider, "_strategy": inspector.strategy}
 
 
 class LoadModelStep(Step):
@@ -55,7 +55,8 @@ class LoadModelStep(Step):
             from genlab.models.registry import get_provider
             provider = get_provider(ctx["model"])(config=_cfg_to_dict(ctx.get("config")))
         mgr = ModelManager(cache_dir=paths["cache_dir"])
-        artifact_path = mgr.ensure_provider(provider)
+        strategy = ctx.get("_strategy", "selective")
+        artifact_path = mgr.ensure_provider(provider, strategy=strategy)
         provider.load(artifact_path)
         return {"provider": provider, "manager": mgr}
 

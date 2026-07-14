@@ -21,45 +21,24 @@ class AssetManager:
         self._cache_dir.mkdir(parents=True, exist_ok=True)
         self._config = config or {}
 
-    def resolve(self, provider: Any) -> str:
+    def resolve(self, provider: Any, strategy: str = "selective") -> str:
+        patterns = None if strategy == "full" else provider.get_required_files()
         return self._download(
             repo_id=provider.get_model_id(),
-            patterns=provider.get_required_files(),
+            patterns=patterns,
         )
 
     def resolve_raw(self, repo_id: str) -> str:
         return self._download(repo_id=repo_id, patterns=None)
 
     def _snapshot_kwargs(self, repo_id: str, patterns: list[str] | None) -> dict:
-        use_symlinks = self._resolve_symlinks()
         kwargs: dict[str, Any] = dict(
             repo_id=repo_id,
             local_dir=self._cache_dir / repo_id.replace("/", "__"),
-            local_dir_use_symlinks=use_symlinks,
-            resume_download=True,
         )
         if patterns is not None:
             kwargs["allow_patterns"] = patterns
         return kwargs
-
-    def _resolve_symlinks(self) -> bool:
-        val = self._resolve_config_key("download", "cache_symlinks")
-        if val == "auto":
-            return self._symlinks_supported()
-        return bool(val)
-
-    def _symlinks_supported(self) -> bool:
-        try:
-            link = self._cache_dir / ".symlink_test"
-            target = self._cache_dir / ".symlink_target"
-            target.write_text("")
-            link.symlink_to(target, target_is_directory=False)
-            ok = link.exists()
-            link.unlink(missing_ok=True)
-            target.unlink(missing_ok=True)
-            return ok
-        except (OSError, NotImplementedError):
-            return False
 
     def _resolve_config_key(self, *keys: str) -> Any:
         value: Any = self._config

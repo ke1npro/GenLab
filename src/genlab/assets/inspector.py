@@ -3,9 +3,18 @@ from __future__ import annotations
 from typing import Any
 
 
+_STRATEGY_FULL = "full"
+_STRATEGY_SELECTIVE = "selective"
+
+
 class ModelInspector:
     def __init__(self, asset_manager: Any):
         self._am = asset_manager
+        self._strategy = _STRATEGY_SELECTIVE
+
+    @property
+    def strategy(self) -> str:
+        return self._strategy
 
     def inspect(self, provider: Any) -> dict[str, Any]:
         meta = provider.get_metadata()
@@ -17,6 +26,24 @@ class ModelInspector:
             "cached": cached is not None,
             "cached_path": str(cached) if cached else None,
         }
+
+    def _menu(self, provider: Any) -> str:
+        cached = self._am.cached_path(provider.get_model_id())
+        if cached:
+            return _STRATEGY_SELECTIVE
+
+        print("\nOpciones de descarga:")
+        print("  1. Inteligente (solo archivos necesarios, hf_transfer si disponible)")
+        print("  2. Completa (repo completo, sin filtros)")
+        opcion = input("\n  Elige (1/2) [1]: ").strip()
+        self._strategy = _STRATEGY_FULL if opcion == "2" else _STRATEGY_SELECTIVE
+        return self._strategy
+
+    def _resolve_with_strategy(self, provider: Any) -> str:
+        model_id = provider.get_model_id()
+        if self._strategy == _STRATEGY_FULL:
+            return self._am.resolve_raw(model_id)
+        return self._am.resolve(provider)
 
     def print_report(self, provider: Any) -> None:
         info = self.inspect(provider)
@@ -63,6 +90,7 @@ class ModelInspector:
         print(f"  {'Caché HF:':<20} {cache_status}")
         if diag["cached"]:
             print(f"  {'Ruta:':<20} {diag['cached_path']}")
+        print(f"  {'Modo:':<20} {'Selectivo' if self._strategy == _STRATEGY_SELECTIVE else 'Completo'}")
         print(sep)
         return diag
 
@@ -71,6 +99,7 @@ class ModelInspector:
         if info["cached"]:
             return True
 
+        self._menu(provider)
         diag = self.diagnostic_report(provider)
         print(f"\nSe descargarán ~{diag['download_size_gb']} GB.")
         respuesta = input("  ¿Continuar? (s/N): ").strip().lower()

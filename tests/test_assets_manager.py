@@ -103,12 +103,6 @@ def test_diagnostic_structure(tmp_path, monkeypatch):
     assert diag["repo_id"] == "test/model"
 
 
-def test_symlinks_supported(tmp_path):
-    am = AssetManager(str(tmp_path / "cache"))
-    result = am._symlinks_supported()
-    assert isinstance(result, bool)
-
-
 def test_disk_free_gb(tmp_path):
     am = AssetManager(str(tmp_path / "cache"))
     free = am._disk_free_gb()
