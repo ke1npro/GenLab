@@ -23,7 +23,9 @@ class FluxProvider(BaseProvider):
             "model_index.json",
             "scheduler/*",
             "text_encoder/*",
+            "text_encoder_2/*",
             "tokenizer/*",
+            "tokenizer_2/*",
             "transformer/*",
             "vae/*",
         ]
