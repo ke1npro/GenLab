@@ -100,7 +100,7 @@ class PostprocessStep(Step):
 
 class ExportStep(Step):
     def execute(self, ctx: dict) -> dict:
-        from genlab.services.exporter import export_video
+        from genlab.services.exporter import export_image, export_video
 
         result = ctx["result"]
         paths = ctx["paths"]
@@ -123,6 +123,15 @@ class ExportStep(Step):
             "profile": config.get("profile", {}).get("name", "default"),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
+
+        image = result.get("image")
+        if image is not None:
+            image_path = export_image(
+                image=image,
+                output_dir=paths["runs_dir"],
+                manifest=manifest,
+            )
+            return {"image_path": image_path, "manifest": manifest}
 
         video_path = export_video(
             frames=result.get("frames", []),

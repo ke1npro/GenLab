@@ -32,6 +32,29 @@ def export_video(
     return video_path
 
 
+def export_image(
+    image: Any,
+    output_dir: str,
+    manifest: dict | None = None,
+) -> str:
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    run_id = uuid.uuid4().hex[:12]
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    image_filename = f"genlab_{timestamp}_{run_id}.png"
+    image_path = str(output_path / image_filename)
+
+    image.save(image_path)
+
+    if manifest:
+        manifest_path = str(output_path / f"genlab_{timestamp}_{run_id}_manifest.json")
+        with open(manifest_path, "w", encoding="utf-8") as f:
+            json.dump(manifest, f, indent=2, ensure_ascii=False)
+
+    return image_path
+
+
 def _write_video(frames: list, path: str, fps: int) -> None:
     try:
         import imageio
