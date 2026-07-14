@@ -75,7 +75,8 @@ class PrepareInputsStep(Step):
 
         overrides = dict(ctx.get("overrides", {}))
         model_overrides = overrides.pop("model", {})
-        model_cfg = ctx.get("config", {}).get("model", {})
+        cfg = _cfg_to_dict(ctx.get("config"))
+        model_cfg = cfg.get("model", {})
 
         merged = {**model_cfg, **model_overrides}
         inputs = task.prepare_inputs(**{**kwargs, **merged})
@@ -104,7 +105,7 @@ class ExportStep(Step):
 
         result = ctx["result"]
         paths = ctx["paths"]
-        config = ctx.get("config", {})
+        config = _cfg_to_dict(ctx.get("config"))
         model_name = ctx["model"]
         task_name = ctx["task"]
         kwargs = ctx.get("kwargs", {})

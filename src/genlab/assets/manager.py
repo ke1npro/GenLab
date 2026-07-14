@@ -35,7 +35,7 @@ class AssetManager:
         kwargs: dict[str, Any] = dict(
             repo_id=repo_id,
             local_dir=self._cache_dir / repo_id.replace("/", "__"),
-            max_workers=4,
+            max_workers=8,
         )
         if patterns is not None:
             kwargs["allow_patterns"] = patterns
