@@ -32,10 +32,13 @@ class AssetManager:
         return self._download(repo_id=repo_id, patterns=None)
 
     def _snapshot_kwargs(self, repo_id: str, patterns: list[str] | None) -> dict:
+        mw = self._resolve_config_key("download", "max_workers")
+        if mw is None:
+            mw = os.environ.get("GENLAB_MAX_WORKERS", "6")
         kwargs: dict[str, Any] = dict(
             repo_id=repo_id,
             local_dir=self._cache_dir / repo_id.replace("/", "__"),
-            max_workers=6,
+            max_workers=int(mw),
         )
         if patterns is not None:
             kwargs["allow_patterns"] = patterns
