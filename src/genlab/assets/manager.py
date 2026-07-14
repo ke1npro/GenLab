@@ -114,7 +114,7 @@ class AssetManager:
     def _download(self, repo_id: str, patterns: list[str] | None) -> str:
         from huggingface_hub import snapshot_download
 
-        estimate = self._estimate_raw(repo_id, patterns)
+        estimate = self.estimate_raw(repo_id, patterns)
         self._verify_disk_space(estimate["total_bytes"])
         self._enable_hf_transfer(estimate["total_bytes"])
 
@@ -181,9 +181,10 @@ class AssetManager:
             _BANDWIDTH_CACHE_AT = now
             return bw
         except Exception:
-            _BANDWIDTH_CACHE = 0.0
-            _BANDWIDTH_CACHE_AT = now
-            return 0.0
+            pass
+        _BANDWIDTH_CACHE = 0.0
+        _BANDWIDTH_CACHE_AT = now
+        return 0.0
 
     def probe_bandwidth(self) -> float:
         return self._probe_bandwidth()
@@ -199,8 +200,9 @@ class AssetManager:
 
         total_bytes = est["total_bytes"]
         time_min = 0.0
-        if bw > 0 and total_bytes > 0:
-            time_min = (total_bytes / (1024 * 1024)) / bw / 60
+        effective_bw = bw if bw > 1.0 else 0.0
+        if effective_bw > 0 and total_bytes > 0:
+            time_min = (total_bytes / (1024 * 1024)) / effective_bw / 60
 
         return {
             "model_name": provider.get_metadata().get("model_id", model_id),
@@ -211,7 +213,7 @@ class AssetManager:
             "free_space_gb": free,
             "hf_transfer_available": hf_avail,
             "hf_transfer_active": hf_active,
-            "bandwidth_mbps": round(bw, 2),
+            "bandwidth_mbps": round(effective_bw, 2),
             "estimated_time_min": round(time_min, 1),
             "cached": cached is not None,
             "cached_path": str(cached) if cached else None,
