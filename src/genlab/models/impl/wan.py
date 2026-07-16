@@ -39,6 +39,7 @@ class WanT2VProvider(BaseProvider):
 
     def load(self, artifact: str) -> None:
         import gc
+        import json
         import torch
         self.unload()
         try:
@@ -46,11 +47,36 @@ class WanT2VProvider(BaseProvider):
 
             self._device = "cuda" if torch.cuda.is_available() else "cpu"
             dtype = torch.bfloat16
-            self._pipeline = WanPipeline.from_pretrained(
-                artifact,
-                torch_dtype=dtype,
-                device=self._device,
-            )
+
+            # Leer model_index.json local para conocer clases exactas
+            index_path = f"{artifact}/model_index.json"
+            with open(index_path) as f:
+                model_index = json.load(f)
+
+            components = {}
+            skip = {"_class_name", "_ignore_kwargs", "_diffusers_version", "_load_remotely"}
+            for name, class_info in model_index.items():
+                if name in skip or not isinstance(class_info, (list, tuple)):
+                    continue
+                lib, cls_name = class_info
+                if lib == "diffusers":
+                    import diffusers
+                    comp_cls = getattr(diffusers, cls_name, None)
+                elif lib == "transformers":
+                    import transformers
+                    comp_cls = getattr(transformers, cls_name, None)
+                else:
+                    continue
+                if comp_cls is None:
+                    continue
+
+                comp = comp_cls.from_pretrained(artifact, subfolder=name, torch_dtype=dtype)
+                if self._device == "cuda" and hasattr(comp, "to"):
+                    comp = comp.to(self._device)
+                components[name] = comp
+                gc.collect()
+
+            self._pipeline = WanPipeline(**components)
             if self._device == "cuda":
                 self._pipeline.enable_attention_slicing()
             gc.collect()
