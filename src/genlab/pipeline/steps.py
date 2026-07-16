@@ -80,7 +80,7 @@ class PrepareInputsStep(Step):
 
         merged = {**model_cfg, **model_overrides}
         inputs = task.prepare_inputs(**{**kwargs, **merged})
-        return {"task": task, "inputs": inputs}
+        return {"_task_obj": task, "inputs": inputs}
 
 
 class GenerateStep(Step):
@@ -93,9 +93,9 @@ class GenerateStep(Step):
 
 class PostprocessStep(Step):
     def execute(self, ctx: dict) -> dict:
-        task = ctx["task"]
+        task_obj = ctx.get("_task_obj") or ctx["task"]
         outputs = ctx["outputs"]
-        result = task.postprocess(outputs)
+        result = task_obj.postprocess(outputs)
         return {"result": result}
 
 
