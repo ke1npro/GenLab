@@ -40,6 +40,7 @@ class SSD1BProvider(BaseProvider):
         }
 
     def load(self, artifact: str) -> None:
+        import gc
         import torch
         try:
             from diffusers import StableDiffusionXLPipeline
@@ -53,6 +54,9 @@ class SSD1BProvider(BaseProvider):
             self._pipeline.to(self._device)
             if self._device == "cuda":
                 self._pipeline.enable_attention_slicing()
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
         except Exception as exc:
             raise ModelLoadError(f"Error al cargar SSD-1B desde {artifact}: {exc}") from exc
 
@@ -89,11 +93,14 @@ class SSD1BProvider(BaseProvider):
         return {"image": output.images[0]}
 
     def unload(self) -> None:
+        import gc
         import torch
         if self._pipeline is not None:
             self._pipeline = None
+        gc.collect()
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
+            torch.cuda.synchronize()
 
     def supports_offload(self) -> bool:
         return True
