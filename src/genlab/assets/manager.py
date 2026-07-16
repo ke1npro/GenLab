@@ -97,13 +97,17 @@ class AssetManager:
     def _download(self, repo_id: str, patterns: list[str] | None) -> str:
         from huggingface_hub import snapshot_download
 
+        target = self._cache_dir / repo_id.replace("/", "__")
+
+        cached = self.cached_path(repo_id)
+        if cached is not None:
+            return str(cached)
+
         estimate = self.estimate_raw(repo_id, patterns)
         self._verify_disk_space(estimate["total_bytes"])
         self._enable_hf_transfer(estimate["total_bytes"])
 
-        target = self._cache_dir / repo_id.replace("/", "__")
         target.mkdir(parents=True, exist_ok=True)
-
         kwargs = self._snapshot_kwargs(repo_id, patterns)
         snapshot_download(**kwargs)
         return str(target)
