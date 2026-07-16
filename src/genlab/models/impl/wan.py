@@ -44,12 +44,10 @@ class WanT2VProvider(BaseProvider):
             from diffusers import WanPipeline
 
             self._device = "cuda" if torch.cuda.is_available() else "cpu"
-            dtype = torch.float16 if self._device == "cuda" else torch.bfloat16
-            variant = "fp16" if self._device == "cuda" else None
+            dtype = torch.bfloat16
             self._pipeline = WanPipeline.from_pretrained(
                 artifact,
                 torch_dtype=dtype,
-                variant=variant,
             )
             self._pipeline.to(self._device)
             if self._device == "cuda":
