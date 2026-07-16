@@ -50,8 +50,8 @@ class FluxProvider(BaseProvider):
             self._pipeline = FluxPipeline.from_pretrained(
                 artifact,
                 torch_dtype=dtype,
+                device=self._device,
             )
-            self._pipeline.to(self._device)
             if self._device == "cuda":
                 self._pipeline.enable_attention_slicing()
             gc.collect()

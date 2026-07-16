@@ -40,6 +40,7 @@ class WanT2VProvider(BaseProvider):
     def load(self, artifact: str) -> None:
         import gc
         import torch
+        self.unload()
         try:
             from diffusers import WanPipeline
 
@@ -48,14 +49,14 @@ class WanT2VProvider(BaseProvider):
             self._pipeline = WanPipeline.from_pretrained(
                 artifact,
                 torch_dtype=dtype,
+                device=self._device,
             )
-            self._pipeline.to(self._device)
             if self._device == "cuda":
                 self._pipeline.enable_attention_slicing()
-
             gc.collect()
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
+                torch.cuda.synchronize()
         except Exception as exc:
             raise ModelLoadError(f"Error al cargar Wan2.1-T2V-1.3B desde {artifact}: {exc}") from exc
 
