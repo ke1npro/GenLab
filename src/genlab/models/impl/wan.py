@@ -47,7 +47,8 @@ class WanT2VProvider(BaseProvider):
                 torch_dtype=torch.bfloat16,
             )
             if torch.cuda.is_available():
-                self._pipeline.enable_model_cpu_offload()
+                self._pipeline.to("cuda")
+                self._pipeline.enable_attention_slicing()
             else:
                 self._pipeline.to("cpu")
         except Exception as exc:
