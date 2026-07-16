@@ -64,6 +64,7 @@ class Pipeline:
                 raise PipelineError(f"Step '{step_name}' falló: {exc}") from exc
 
         return {
+            "image_path": ctx.get("image_path"),
             "video_path": ctx.get("video_path"),
             "manifest": ctx.get("manifest"),
         }
