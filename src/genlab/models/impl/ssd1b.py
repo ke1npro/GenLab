@@ -50,10 +50,9 @@ class SSD1BProvider(BaseProvider):
                 artifact,
                 torch_dtype=dtype,
             )
+            self._pipeline.to(self._device)
             if self._device == "cuda":
-                self._pipeline.enable_model_cpu_offload()
-            else:
-                self._pipeline.to(self._device)
+                self._pipeline.enable_attention_slicing()
         except Exception as exc:
             raise ModelLoadError(f"Error al cargar SSD-1B desde {artifact}: {exc}") from exc
 
