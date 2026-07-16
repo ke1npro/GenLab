@@ -70,9 +70,22 @@ class WanT2VProvider(BaseProvider):
                 if comp_cls is None:
                     continue
 
-                comp = comp_cls.from_pretrained(artifact, subfolder=name, torch_dtype=dtype)
-                if self._device == "cuda" and hasattr(comp, "to"):
-                    comp = comp.to(self._device)
+                kw = dict(
+                    pretrained_model_name_or_path=artifact,
+                    subfolder=name,
+                    torch_dtype=dtype,
+                )
+                if self._device == "cuda":
+                    kw["device_map"] = {"": 0}
+                    try:
+                        comp = comp_cls.from_pretrained(**kw)
+                    except Exception:
+                        kw.pop("device_map")
+                        comp = comp_cls.from_pretrained(**kw)
+                        if hasattr(comp, "to"):
+                            comp = comp.to(self._device)
+                else:
+                    comp = comp_cls.from_pretrained(**kw)
                 components[name] = comp
                 gc.collect()
 
