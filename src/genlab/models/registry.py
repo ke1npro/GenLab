@@ -25,3 +25,23 @@ def get_provider(name: str) -> type["BaseProvider"]:
 
 def list_providers() -> list[str]:
     return list(_providers.keys())
+
+
+_PIPELINE_TO_PROVIDER: dict[str, str] = {
+    "FluxPipeline": "flux",
+    "StableDiffusionXLPipeline": "sdxl",
+}
+
+
+def detect_provider(model_id: str) -> str | None:
+    try:
+        from huggingface_hub import hf_hub_url
+        import requests
+        url = hf_hub_url(repo_id=model_id, filename="model_index.json")
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+        class_name = data.get("_class_name", "")
+        return _PIPELINE_TO_PROVIDER.get(class_name)
+    except Exception:
+        return None

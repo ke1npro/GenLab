@@ -1,0 +1,8 @@
+model:
+  model_id: segmind/SSD-1B
+  dtype: float16
+  steps: 50
+  guidance_scale: 7.0
+  resolution:
+    width: 1024
+    height: 1024

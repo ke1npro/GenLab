@@ -23,6 +23,16 @@ def test_sdxl_provider_registered():
     assert "sdxl" in list_providers()
 
 
+def test_ssd1b_provider_registered():
+    import genlab.models.impl.ssd1b  # noqa: F401
+    assert "ssd1b" in list_providers()
+
+
+def test_all_providers_on_genlab_import():
+    import genlab
+    assert "ssd1b" in list_providers()
+
+
 def test_text_to_video_task_registered():
     import genlab.tasks.text_to_video  # noqa: F401
     assert "text_to_video" in list_tasks()
@@ -39,5 +49,6 @@ def test_genlab_import_triggers_registration():
     assert "wan" in list_providers()
     assert "flux" in list_providers()
     assert "sdxl" in list_providers()
+    assert "ssd1b" in list_providers()
     assert "text_to_video" in list_tasks()
     assert "text_to_image" in list_tasks()
