@@ -42,6 +42,7 @@ class FluxProvider(BaseProvider):
     def load(self, artifact: str) -> None:
         import gc
         import torch
+        self.unload()
         try:
             from diffusers import FluxPipeline
 
@@ -50,13 +51,20 @@ class FluxProvider(BaseProvider):
             self._pipeline = FluxPipeline.from_pretrained(
                 artifact,
                 torch_dtype=dtype,
-                device=self._device,
             )
             if self._device == "cuda":
+                self._pipeline.to(self._device)
+                for _, comp in self._pipeline.components.items():
+                    if hasattr(comp, 'parameters'):
+                        try:
+                            comp.to(self._device)
+                        except Exception:
+                            pass
                 self._pipeline.enable_attention_slicing()
             gc.collect()
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
+                torch.cuda.synchronize()
         except Exception as exc:
             raise ModelLoadError(f"Error al cargar FLUX desde {artifact}: {exc}") from exc
 

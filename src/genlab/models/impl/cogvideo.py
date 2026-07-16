@@ -42,6 +42,7 @@ class CogVideoProvider(BaseProvider):
     def load(self, artifact: str) -> None:
         import gc
         import torch
+        self.unload()
         try:
             from diffusers import CogVideoXPipeline
 
@@ -50,13 +51,20 @@ class CogVideoProvider(BaseProvider):
             self._pipeline = CogVideoXPipeline.from_pretrained(
                 artifact,
                 torch_dtype=dtype,
-                device=self._device,
             )
             if self._device == "cuda":
+                self._pipeline.to(self._device)
+                for _, comp in self._pipeline.components.items():
+                    if hasattr(comp, 'parameters'):
+                        try:
+                            comp.to(self._device)
+                        except Exception:
+                            pass
                 self._pipeline.enable_attention_slicing()
             gc.collect()
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
+                torch.cuda.synchronize()
         except Exception as exc:
             raise ModelLoadError(f"Error al cargar CogVideoX desde {artifact}: {exc}") from exc
 
